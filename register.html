@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        .check-icon {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .checked .check-icon {
+            color: green;
+        }
+        .unchecked .check-icon {
+            color: red;
+        }
+    </style>
+
+    <script>
+        function updateChecklist() {
+            var password = document.getElementById("password").value;
+            var registerBtn = document.getElementById("register-btn");
+
+            var lengthCheck = document.getElementById("length-check");
+            var upperCheck = document.getElementById("upper-check");
+            var lowerCheck = document.getElementById("lower-check");
+            var numberCheck = document.getElementById("number-check");
+            var specialCheck = document.getElementById("special-check");
+
+            if (password.length >= 8) { lengthCheck.className = "checked"; } else { lengthCheck.className = "unchecked"; }
+            if (/[A-Z]/.test(password)) { upperCheck.className = "checked"; } else { upperCheck.className = "unchecked"; }
+            if (/[a-z]/.test(password)) { lowerCheck.className = "checked"; } else { lowerCheck.className = "unchecked"; }
+            if (/[0-9]/.test(password)) { numberCheck.className = "checked"; } else { numberCheck.className = "unchecked"; }
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) { specialCheck.className = "checked"; } else { specialCheck.className = "unchecked"; }
+
+            if (
+                lengthCheck.classList.contains("checked") &&
+                upperCheck.classList.contains("checked") &&
+                lowerCheck.classList.contains("checked") &&
+                numberCheck.classList.contains("checked") &&
+                specialCheck.classList.contains("checked")
+            ) {
+                registerBtn.disabled = false;
+            } else {
+                registerBtn.disabled = true;
+            }
+        }
+
+        setInterval(() => {
+            const checklistItems = document.querySelectorAll('.checklist li');
+            checklistItems.forEach(item => {
+                const icon = item.querySelector('.check-icon');
+                if (item.classList.contains('checked')) {
+                    icon.textContent = '✅';
+                } else {
+                    icon.textContent = '❌';
+                }
+            });
+        }, 200);
+    </script>
+</head>
+
+<body class="container mt-5">
+    <h2 class="text-center mb-4">User Registration</h2>
+
+    <!-- 🔥 Flash messages (for errors like username already exists) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- 🔥 Corrected form with action -->
+    <form method="post" action="{{ url_for('register') }}" class="mx-auto" style="max-width: 400px;">
+        <input type="text" name="username" class="form-control mb-3" placeholder="Username" required>
+
+        <input id="password" type="password" name="password" class="form-control mb-1" placeholder="Password" required oninput="updateChecklist()">
+
+        <ul class="checklist mb-3">
+            <li id="length-check" class="unchecked"><span class="check-icon">❌</span> Minimum 8 characters</li>
+            <li id="upper-check" class="unchecked"><span class="check-icon">❌</span> At least one uppercase letter (A-Z)</li>
+            <li id="lower-check" class="unchecked"><span class="check-icon">❌</span> At least one lowercase letter (a-z)</li>
+            <li id="number-check" class="unchecked"><span class="check-icon">❌</span> At least one number (0-9)</li>
+            <li id="special-check" class="unchecked"><span class="check-icon">❌</span> At least one special character (!@#$...)</li>
+        </ul>
+
+        <button id="register-btn" class="btn btn-primary w-100" type="submit" disabled>Register</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="{{ url_for('login') }}">Already registered? Login here</a><br>
+        <a href="{{ url_for('admin_login') }}">Admin Login</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
